@@ -56,4 +56,15 @@ body {
   @apply animate-spin rounded-full border-2 border-dark-border border-t-accent-primary;
 }
 
+/* Modal styles */
+@layer utilities {
+  .modal {
+    @apply fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4;
+  }
+  
+  .modal > div {
+    @apply bg-dark-secondary rounded-xl border border-dark-border shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto;
+  }
+}
+
 
