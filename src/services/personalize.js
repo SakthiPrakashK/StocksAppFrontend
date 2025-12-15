@@ -8,17 +8,9 @@ const CONTENTSTACK_REGION = 'eu'
 const PERSONALIZE_EDGE_API_URL = `https://${CONTENTSTACK_REGION}-personalize-edge.contentstack.com`
 
 export const initPersonalize = async (config = {}) => {
-  const hasUserInfo = config.userId || config.liveAttributes
-  
   if (personalizeInitialized && personalizeSdk) {
-    if (hasUserInfo) {
-      console.log('[Personalize] Reinitializing SDK with user info')
-      personalizeInitialized = false
-      personalizeSdk = null
-    } else {
-      console.warn('Personalize SDK already initialized')
-      return personalizeSdk
-    }
+    console.warn('Personalize SDK already initialized')
+    return personalizeSdk
   }
 
   try {
@@ -137,13 +129,6 @@ export const initPersonalizeWithUser = async (userId, userEmail = null) => {
   try {
     const lyticsSegments = await getUserSegments()
     
-    console.log('[Personalize] Initializing with user:', {
-      userId,
-      userEmail,
-      segments: lyticsSegments,
-      segmentsCount: lyticsSegments?.length || 0
-    })
-    
     const initOptions = {
       userId: userId
     }
@@ -155,26 +140,7 @@ export const initPersonalizeWithUser = async (userId, userEmail = null) => {
       }
     }
 
-    const result = await initPersonalize(initOptions)
-    
-    if (result) {
-      const experiences = result.getExperiences()
-      const variantAliases = result.getVariantAliases()
-      
-      console.log('[Personalize] After user initialization:')
-      console.log('  - Experiences:', experiences)
-      console.log('  - Variant Aliases:', variantAliases)
-      
-      if (variantAliases.length === 0) {
-        console.warn('[Personalize] ⚠️ No variant aliases found. Possible reasons:')
-        console.warn('  1. User segments do not match any audience conditions')
-        console.warn('  2. Variants are not published in Contentstack')
-        console.warn('  3. Segment names in Lytics do not match audience names in Personalize')
-        console.warn('  Current user segments:', lyticsSegments)
-      }
-    }
-    
-    return result
+    return await initPersonalize(initOptions)
   } catch (error) {
     console.error('Failed to initialize Personalize with user:', error)
     return null

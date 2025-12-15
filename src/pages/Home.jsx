@@ -3,12 +3,16 @@ import { Link } from 'react-router-dom'
 import contentstackApi from '../services/contentstack'
 import { userApi } from '../services/api'
 import { useAuth } from '../context/AuthContext'
+import { useLanguage } from '../context/LanguageContext'
 import { usePersonalizedContent } from '../hooks/usePersonalizedContent'
+import { useTranslation } from '../locales/translations'
 import StockCard from '../components/StockCard'
 import Button from '../components/Button'
 
 const Home = () => {
   const { isAuthenticated, user } = useAuth()
+  const { locale } = useLanguage()
+  const { t } = useTranslation(locale)
   const { getPersonalizedPage, variantAliases, hasPersonalization } = usePersonalizedContent()
   const [pageData, setPageData] = useState(null)
   const [heroData, setHeroData] = useState(null)
@@ -30,7 +34,6 @@ const Home = () => {
         if (page?.hero_section_data) {
           setHeroData(page.hero_section_data)
         } else {
-          // Fallback to direct fetch
           const hero = await contentstackApi.getHeroSection()
           setHeroData(hero)
         }
@@ -60,7 +63,7 @@ const Home = () => {
     }
 
     fetchData()
-  }, [isAuthenticated, user, getPersonalizedPage, hasPersonalization])
+  }, [isAuthenticated, user, getPersonalizedPage, hasPersonalization, locale])
 
   if (loading) {
     return (
@@ -93,30 +96,36 @@ const Home = () => {
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-accent-primary/10 rounded-full mb-6">
                 <span className="w-2 h-2 bg-accent-success rounded-full animate-pulse"></span>
-                <span className="text-sm font-medium text-accent-primary">Markets Open</span>
+                <span className="text-sm font-medium text-accent-primary">{t('markets_open')}</span>
               </div>
               
               <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6">
-                {heroData?.title || 'Invest in India\'s Top Stocks'}
+                {heroData?.headline || 'Invest in India\'s Top Stocks'}
               </h1>
               
               <p className="text-lg text-dark-muted mb-8 max-w-xl">
-                {heroData?.subtitle || 'Trade NIFTY 50 stocks with confidence. Real-time prices, detailed insights, and seamless transactions.'}
+                {heroData?.subheadline || 'Trade NIFTY 50 stocks with confidence. Real-time prices, detailed insights, and seamless transactions.'}
               </p>
 
+              {heroData?.description && (
+                <p className="text-base text-dark-muted/80 mb-8 max-w-xl">
+                  {heroData.description}
+                </p>
+              )}
+
               <div className="flex flex-wrap gap-4">
-                <Link to="/stocks">
+                <Link to={heroData?.cta_primary_url?.href || '/stocks'}>
                   <Button size="lg" className="shadow-lg shadow-accent-primary/25">
-                    Explore Stocks
+                    {heroData?.cta_primary_text || 'Explore Stocks'}
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
                   </Button>
                 </Link>
-                {!isAuthenticated && (
-                  <Link to="/signup">
+                {!isAuthenticated && heroData?.cta_secondary_text && (
+                  <Link to={heroData?.cta_secondary_url?.href || '/signup'}>
                     <Button variant="outline" size="lg">
-                      Create Account
+                      {heroData.cta_secondary_text}
                     </Button>
                   </Link>
                 )}
@@ -126,15 +135,15 @@ const Home = () => {
               <div className="grid grid-cols-3 gap-6 mt-12 pt-8 border-t border-dark-border/50">
                 <div>
                   <p className="text-3xl font-display font-bold text-white">100+</p>
-                  <p className="text-sm text-dark-muted">Stocks</p>
+                  <p className="text-sm text-dark-muted">{t('stats_stocks')}</p>
                 </div>
                 <div>
                   <p className="text-3xl font-display font-bold text-white">10+</p>
-                  <p className="text-sm text-dark-muted">Sectors</p>
+                  <p className="text-sm text-dark-muted">{t('stats_sectors')}</p>
                 </div>
                 <div>
                   <p className="text-3xl font-display font-bold text-white">₹0</p>
-                  <p className="text-sm text-dark-muted">Commission</p>
+                  <p className="text-sm text-dark-muted">{t('stats_commission')}</p>
                 </div>
               </div>
             </div>
@@ -200,15 +209,15 @@ const Home = () => {
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h2 className="font-display text-2xl sm:text-3xl font-bold text-white mb-2">
-                  Featured Stocks
+                  {t('featured_stocks')}
                 </h2>
                 <p className="text-dark-muted">
-                  Hand-picked stocks performing exceptionally well
+                  {t('featured_stocks_subtitle')}
                 </p>
               </div>
               <Link to="/stocks">
                 <Button variant="ghost">
-                  View All
+                  {t('view_all')}
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
@@ -232,10 +241,10 @@ const Home = () => {
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h2 className="font-display text-2xl sm:text-3xl font-bold text-white mb-2">
-                  Recently Viewed
+                  {t('recently_viewed')}
                 </h2>
                 <p className="text-dark-muted">
-                  Pick up where you left off
+                  {t('recently_viewed_subtitle')}
                 </p>
               </div>
             </div>
@@ -257,21 +266,20 @@ const Home = () => {
               <div className="absolute inset-0 bg-gradient-to-r from-accent-primary/10 to-accent-success/10"></div>
               <div className="relative">
                 <h2 className="font-display text-3xl sm:text-4xl font-bold text-white mb-4">
-                  Start Your Investment Journey
+                  {t('start_journey')}
                 </h2>
                 <p className="text-dark-muted mb-8 max-w-2xl mx-auto">
-                  Join thousands of investors who trust StockApp for their trading needs. 
-                  Sign up now and get started with ₹0 commission trades.
+                  {t('start_journey_subtitle')}
                 </p>
                 <div className="flex flex-wrap justify-center gap-4">
                   <Link to="/signup">
                     <Button size="lg">
-                      Create Free Account
+                      {t('create_free_account')}
                     </Button>
                   </Link>
                   <Link to="/stocks">
                     <Button variant="outline" size="lg">
-                      Explore Stocks First
+                      {t('explore_stocks_first')}
                     </Button>
                   </Link>
                 </div>
@@ -286,10 +294,10 @@ const Home = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="font-display text-2xl sm:text-3xl font-bold text-white mb-4">
-              Why Choose StockApp?
+              {t('why_choose')}
             </h2>
             <p className="text-dark-muted max-w-2xl mx-auto">
-              Everything you need to make informed investment decisions
+              {t('why_choose_subtitle')}
             </p>
           </div>
 
@@ -300,9 +308,9 @@ const Home = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <h3 className="font-semibold text-white mb-2">Real-Time Prices</h3>
+              <h3 className="font-semibold text-white mb-2">{t('realtime_prices')}</h3>
               <p className="text-sm text-dark-muted">
-                Get live stock prices updated every second for accurate trading decisions
+                {t('realtime_prices_desc')}
               </p>
             </div>
 
@@ -312,9 +320,9 @@ const Home = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
               </div>
-              <h3 className="font-semibold text-white mb-2">Secure Trading</h3>
+              <h3 className="font-semibold text-white mb-2">{t('secure_trading')}</h3>
               <p className="text-sm text-dark-muted">
-                Bank-grade security ensures your investments are always protected
+                {t('secure_trading_desc')}
               </p>
             </div>
 
@@ -324,9 +332,9 @@ const Home = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
               </div>
-              <h3 className="font-semibold text-white mb-2">Detailed Analytics</h3>
+              <h3 className="font-semibold text-white mb-2">{t('detailed_analytics')}</h3>
               <p className="text-sm text-dark-muted">
-                Comprehensive insights to help you understand market trends
+                {t('detailed_analytics_desc')}
               </p>
             </div>
           </div>

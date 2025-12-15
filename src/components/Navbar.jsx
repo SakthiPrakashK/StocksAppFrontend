@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { trackNavigation, trackClick } from '../services/lytics'
+import LanguageSwitcher from './LanguageSwitcher'
 
 const Navbar = ({ data }) => {
   const { isAuthenticated, user, logout } = useAuth()
@@ -99,6 +100,9 @@ const Navbar = ({ data }) => {
 
           {/* Right Section */}
           <div className="flex items-center gap-3">
+            {/* Language Switcher */}
+            <LanguageSwitcher />
+            
             {isAuthenticated ? (
               <div className="relative">
                 <button

@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
+import { LanguageProvider } from './context/LanguageContext'
 import Layout from './components/Layout'
 import Home from './pages/Home'
 import Stocks from './pages/Stocks'
@@ -58,38 +59,40 @@ const LyticsTracker = () => {
 
 function App() {
   return (
-    <AuthProvider>
-      <LyticsTracker />
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/stocks" element={<Stocks />} />
-          <Route path="/stock/:symbol" element={<StockDetail />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          } />
-          <Route path="/portfolio" element={
-            <ProtectedRoute>
-              <Portfolio />
-            </ProtectedRoute>
-          } />
-          <Route path="/wallet" element={
-            <ProtectedRoute>
-              <Wallet />
-            </ProtectedRoute>
-          } />
-          <Route path="/profile" element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          } />
-        </Routes>
-      </Layout>
-    </AuthProvider>
+    <LanguageProvider>
+      <AuthProvider>
+        <LyticsTracker />
+        <Layout>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/stocks" element={<Stocks />} />
+            <Route path="/stock/:symbol" element={<StockDetail />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/portfolio" element={
+              <ProtectedRoute>
+                <Portfolio />
+              </ProtectedRoute>
+            } />
+            <Route path="/wallet" element={
+              <ProtectedRoute>
+                <Wallet />
+              </ProtectedRoute>
+            } />
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            } />
+          </Routes>
+        </Layout>
+      </AuthProvider>
+    </LanguageProvider>
   )
 }
 

@@ -2,14 +2,17 @@ import { useState, useEffect } from 'react'
 import Navbar from './Navbar'
 import Footer from './Footer'
 import contentstackApi from '../services/contentstack'
+import { useLanguage } from '../context/LanguageContext'
 
 const Layout = ({ children }) => {
+  const { locale } = useLanguage()
   const [navbarData, setNavbarData] = useState(null)
   const [footerData, setFooterData] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchLayoutData = async () => {
+      setLoading(true)
       try {
         const [navbar, footer] = await Promise.all([
           contentstackApi.getNavbar(),
@@ -25,7 +28,7 @@ const Layout = ({ children }) => {
     }
 
     fetchLayoutData()
-  }, [])
+  }, [locale])
 
   if (loading) {
     return (

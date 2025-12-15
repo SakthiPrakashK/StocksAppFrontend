@@ -1,14 +1,21 @@
-const CONTENTSTACK_API_KEY = import.meta.env.VITE_CONTENTSTACK_API_KEY || 'bltd32bcb22230fed0f'
-const CONTENTSTACK_DELIVERY_TOKEN = import.meta.env.VITE_CONTENTSTACK_DELIVERY_TOKEN || 'cs0281bc1a5b766c893b26c830'
-const CONTENTSTACK_ENVIRONMENT = import.meta.env.VITE_CONTENTSTACK_ENVIRONMENT || 'prod'
+const CONTENTSTACK_API_KEY = import.meta.env.VITE_CONTENTSTACK_API_KEY
+const CONTENTSTACK_DELIVERY_TOKEN = import.meta.env.VITE_CONTENTSTACK_DELIVERY_TOKEN 
+const CONTENTSTACK_ENVIRONMENT = import.meta.env.VITE_CONTENTSTACK_ENVIRONMENT 
 const CONTENTSTACK_REGION = 'eu'
 
 const BASE_URL = `https://${CONTENTSTACK_REGION}-cdn.contentstack.com/v3`
+
+const getCurrentLocale = () => {
+  return localStorage.getItem('locale') || 'en-us'
+}
 
 const fetchFromContentstack = async (endpoint, params = {}) => {
   const url = new URL(`${BASE_URL}${endpoint}`)
   
   params.environment = CONTENTSTACK_ENVIRONMENT
+  if (!params.locale) {
+    params.locale = getCurrentLocale()
+  }
   
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined && value !== null) {
